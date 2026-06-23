@@ -21,8 +21,8 @@ const animalSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      default: "КРС",
-      enum: ["КРС", "МРС", "Лошади", "Другое"],
+      default: "Корова",
+      enum: ["Верблюд", "Лошадь", "Корова", "Овца", "Коза"],
     },
     breed: {
       type: String,
