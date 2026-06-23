@@ -54,3 +54,33 @@ authRouter.post("/login", async (req, res, next) => {
 authRouter.get("/me", requireAuth, (req, res) => {
   res.json({ user: req.user.toSafeJSON() });
 });
+
+authRouter.patch("/password", requireAuth, async (req, res, next) => {
+  try {
+    requireFields(req.body, ["currentPassword", "newPassword"]);
+
+    if (String(req.body.newPassword).length < 6) {
+      const error = new Error("New password must be at least 6 characters");
+      error.status = 422;
+      throw error;
+    }
+
+    const user = await User.findById(req.user._id).select("+passwordHash");
+    const valid = user
+      ? await user.comparePassword(req.body.currentPassword)
+      : false;
+
+    if (!valid) {
+      const error = new Error("Current password is incorrect");
+      error.status = 401;
+      throw error;
+    }
+
+    user.passwordHash = await User.hashPassword(req.body.newPassword);
+    await user.save();
+
+    res.json({ ok: true });
+  } catch (error) {
+    next(error);
+  }
+});
