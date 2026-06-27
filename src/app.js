@@ -2,6 +2,8 @@ import cors from "cors";
 import express from "express";
 import { authRouter } from "./routes/auth.routes.js";
 import { animalRouter } from "./routes/animal.routes.js";
+import { farmRouter } from "./routes/farm.routes.js";
+import { breedingGroupRouter } from "./routes/breedingGroup.routes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { notFound } from "./middleware/notFound.js";
 
@@ -22,6 +24,8 @@ export function createApp() {
 
   app.use("/api/auth", authRouter);
   app.use("/api/animals", animalRouter);
+  app.use("/api/farm", farmRouter);
+  app.use("/api/breeding-groups", breedingGroupRouter);
 
   app.use(notFound);
   app.use(errorHandler);

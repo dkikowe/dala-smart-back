@@ -1,5 +1,30 @@
 import mongoose from "mongoose";
 
+const healthRecordSchema = new mongoose.Schema(
+  {
+    kind: {
+      type: String,
+      enum: ["vaccination", "treatment"],
+      required: true,
+    },
+    title: {
+      type: String,
+      trim: true,
+      required: true,
+    },
+    note: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    date: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { timestamps: true },
+);
+
 const animalSchema = new mongoose.Schema(
   {
     ownerId: {
@@ -39,6 +64,37 @@ const animalSchema = new mongoose.Schema(
       enum: ["Самка", "Самец", "Не указано"],
       default: "Не указано",
     },
+    motherIdCode: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    fatherIdCode: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    breedingGroup: {
+      type: String,
+      trim: true,
+      default: "",
+      index: true,
+    },
+    breedingGroupName: {
+      type: String,
+      trim: true,
+      default: "",
+      index: true,
+    },
+    breedingMaleIdCodes: {
+      type: [String],
+      default: [],
+    },
+    ageGroup: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     birthDate: Date,
     weightKg: {
       type: Number,
@@ -48,6 +104,36 @@ const animalSchema = new mongoose.Schema(
       type: String,
       enum: ["На ферме", "На выгуле", "Не зашел"],
       default: "На ферме",
+    },
+    lifecycleStatus: {
+      type: String,
+      enum: ["on_farm", "transferred", "dead", "sold_alive", "slaughtered", "archived"],
+      default: "on_farm",
+      index: true,
+    },
+    departureReason: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    departureComment: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    departureDate: Date,
+    newOwner: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    healthRecords: {
+      type: [healthRecordSchema],
+      default: [],
+    },
+    photoUrl: {
+      type: String,
+      default: "",
     },
   },
   { timestamps: true },
@@ -65,9 +151,29 @@ animalSchema.methods.toJSON = function toJSON() {
     breed: this.breed,
     color: this.color,
     gender: this.gender,
+    motherIdCode: this.motherIdCode,
+    fatherIdCode: this.fatherIdCode,
+    breedingGroup: this.breedingGroup,
+    breedingGroupName: this.breedingGroupName,
+    breedingMaleIdCodes: this.breedingMaleIdCodes,
+    ageGroup: this.ageGroup,
     birthDate: this.birthDate,
     weightKg: this.weightKg,
     status: this.status,
+    lifecycleStatus: this.lifecycleStatus,
+    departureReason: this.departureReason,
+    departureComment: this.departureComment,
+    departureDate: this.departureDate,
+    newOwner: this.newOwner,
+    healthRecords: (this.healthRecords ?? []).map((record) => ({
+      id: record._id.toString(),
+      kind: record.kind,
+      title: record.title,
+      note: record.note,
+      date: record.date,
+      createdAt: record.createdAt,
+    })),
+    photoUrl: this.photoUrl || "",
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,
   };
